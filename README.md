@@ -1,6 +1,75 @@
-# Getting Started with Create React App
+# react-fakelist
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> An Hook to render large list for your react apps.
+
+The goal of this hook was to provide an easy way to render large amount of datas as list with windowing in my react apps, and that's pretty all it does. If you are looking for more advanced features, you should check other virtualisation libraries like https://github.com/bvaughn/react-window or https://virtuoso.dev/ They both provide some great features and I often relly on them to render my lists.
+
+but if you are looking for a easy way to display large list, you could give it a try.
+
+
+### How to: window scrolling
+```js
+import useFakeList from 'react-fakelist';
+
+const renderItem = (item, index)=>{
+  return  <Contact key={index} contact={item}/>
+}
+
+// virtualize list with window scrolling
+function App() {
+  const [emails, setEmails] = React.useState([...a bunch of object...]);
+  const items = useFakeList(emails, undefined, renderItem, {approximateElementHeight: 68});
+  
+  return (
+    <div className="App">
+      <header className="App-header">
+        <div className="listContacts">
+            {items}
+        </div>
+      </header>
+    </div>
+  );
+}
+```
+### How to: div scrolling
+```js
+import useFakeList from 'react-fakelist';
+
+const renderItem = (item, index)=>{
+  return  <Contact key={index} contact={item}/>
+}
+
+// virtualize list with window scrolling
+function App() {
+  const [emails, setEmails] = React.useState([...a bunch of object...]);
+  const scroller=React.useRef();
+  const items = useFakeList(emails, scroller, renderItem, {approximateElementHeight: 68});
+  
+  return (
+    <div className="App">
+      <header className="App-header">
+        <div className="listContacts" style={{height: 400}} ref={scroller}>
+            {items}
+        </div>
+      </header>
+    </div>
+  );
+}
+```
+## Hook parameters:
+> const items = useFakeList( datas, scrollerRef, renderItem, options)
+- **datas**: Array, what to display in list
+- **scrollRef**: a ref to the container of  your list (ex: a div with an height and overflow-y auto). If falsy (or undefined), will use the whole window as scroller
+- **renderItem**: a function for rendering each item in the list. Will received 2 arguments:
+  - **item**: the item to render
+  - **index**: index in list of the item
+- **options**: some configuration options for the hook
+  - **id** a custom id, if used more than once in a page
+  - **approximateElementHeight** approximated height for a component
+  - **overhead** number of offscreen elements to draw
+  - **assumeHeightIsConstant** if true, will precalculate position based on approximateElementHeight but will not be responsive. If set to false, let onResize event do **heavy** calculations
+## Hook return value:
+the selected items to display in your page/div. Simple as that!
 
 ## Available Scripts
 
@@ -8,7 +77,7 @@ In the project directory, you can run:
 
 ### `yarn start`
 
-Runs the app in the development mode.\
+Runs the demo app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
@@ -19,52 +88,6 @@ You will also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn build`
+### `yarn compile`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Build react-fakelist library
