@@ -7,13 +7,32 @@ const LIST_SIZE = 5000;
 const renderItem = (item, index)=>{
   return  <Contact key={index} contact={item}/>
 }
+
+function Demo0({emails}){
+  // SImple demo: scroll is set to window scroll (2nd param is undefined)
+  const items = useFakeList(emails, undefined, renderItem,{approximateElementHeight: 68});
+  return items;
+}
+function Demo1({emails}){
+  // Simple demo: scroll is set to an inner div with 400px height
+  const scroller=React.useRef();
+  const items = useFakeList(emails, scroller, renderItem,{approximateElementHeight: 68});
+  return <div className="scroller" ref={scroller}>{items}</div>;
+}
+
+const DEMOS = [
+  (emails)=> <Demo0 emails={emails}/>,
+  (emails)=> <Demo1 emails={emails}/>,
+];
+
 function App() {
   const [emails, setEmails] = React.useState(undefined);
+  const [demo, setDemo] = React.useState(0);
   const [showAll, setShowAll] = React.useState(true);
   // const noDisplay = React.useCallback((item, i)=> {
   //   return showAll || item.display;
   // },[showAll]);
-  const items = useFakeList(emails, undefined, renderItem,{approximateElementHeight: 68});
+  // const items = useFakeList(emails, undefined, renderItem,{approximateElementHeight: 68});
   React.useEffect(()=>{
     // generate a bunch of emails
     let emails = [];
@@ -30,17 +49,23 @@ function App() {
   },[]);
   return (
     <div className="App">
+      <div className="Selector">
+        <input type="radio" checked={demo === 0} name="demo" onChange={()=> setDemo(0)}/>Demo 0
+        <input type="radio" checked={demo === 1} name="demo" onChange={()=> setDemo(1)}/>Demo 1
+      </div>
       <header className="App-header">
         
         { emails === undefined ?
           <div className="lds-dual-ring">Loading...</div>
           : <div className="listContacts">
-            {items}
+            {DEMOS[demo](emails)}
             </div>}
       </header>
     </div>
   );
 }
+
+
 
 function Contact({contact}){
   return <div className="contact">
