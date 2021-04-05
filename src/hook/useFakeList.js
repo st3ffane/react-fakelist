@@ -23,10 +23,7 @@ const BodyElement = {
     },
     __str__: 'Body Element'
 };
-// add scrollY
-Object.defineProperty(BodyElement, 'scrollY', {
-  get:()=> window.scrollY
-});
+
 Object.defineProperty(BodyElement, 'scrollTop', {
   get:()=> window.scrollY
 });
@@ -49,6 +46,7 @@ export default function useFakeList(
   const [config] = React.useState({...DEFAULT_OPTIONS, ...options});
   const approxHeight = config.approximateElementHeight;
   React.useEffect(() => {
+    /* istanbul ignore else no work */
     if (scrollerRef.current) {
       // when ref got something, we can start drawing items
       setDataItems(datas)
@@ -57,13 +55,15 @@ export default function useFakeList(
   React.useEffect(()=>{
     let i = 0;
     let current = scrollerRef.current;
+    /* istanbul ignore if no work */
     if(!current) return;
     const onScroll = ()=>{
       // if scroll more than approxHeight => redraw
-        if(Math.abs(current.scrollTop - i) > approxHeight){
-          i=current.scrollTop;
-          setRefresh(i);          
-        }
+      /* istanbul ignore else no work */
+      if(Math.abs(current.scrollTop - i) > approxHeight){
+        i=current.scrollTop;
+        setRefresh(i);          
+      }
         
       };
     current.addEventListener('scroll',onScroll);
@@ -73,6 +73,7 @@ export default function useFakeList(
   },[scrollerRef.current, approxHeight]);
   
   const renderList = React.useMemo(()=>{
+    /* istanbul ignore else dummy users */
     if(isFunction(renderElement) && scrollerRef.current){
       const datas = dataItems || [];
       const scrollerSize = scrollerRef.current.getBoundingClientRect();
