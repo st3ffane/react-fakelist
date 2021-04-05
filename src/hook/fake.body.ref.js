@@ -1,9 +1,9 @@
 // Fake body ref to ensure consistency
 const BodyElement = {
-    getBoundingClientRect: ()=>{
-      // returm document.documentElement datas
-      return document.body.getBoundingClientRect()
-    },
+    // getBoundingClientRect: ()=>{
+    //   // returm document.documentElement datas
+    //   return document.body.getBoundingClientRect()
+    // },
     addEventListener: (type, cllbck)=>{
       window.addEventListener(type, cllbck);
     },

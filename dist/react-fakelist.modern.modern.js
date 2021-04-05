@@ -1,4 +1,5 @@
 import React from 'react';
+import { useResizeDetector } from 'react-resize-detector';
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -23,9 +24,6 @@ var isFunction = function isFunction(obj) {
 };
 
 var BodyElement = {
-  getBoundingClientRect: function getBoundingClientRect() {
-    return document.body.getBoundingClientRect();
-  },
   addEventListener: function addEventListener(type, cllbck) {
     window.addEventListener(type, cllbck);
   },
@@ -88,12 +86,16 @@ function useFakeList(datas, scrollerRef, renderElement, options, validateItem) {
   var _React$useState3 = React.useState(_extends({}, DEFAULT_OPTIONS, options)),
       config = _React$useState3[0];
 
+  var sizes = React.useRef([]);
+  var setItemHeight = React.useCallback(function (i, h) {
+    sizes.current[i] = h;
+  }, []);
   var approxHeight = config.approximateElementHeight;
   React.useEffect(function () {
     if (scrollerRef.current) {
       setDataItems(datas);
     }
-  }, [scrollerRef.current]);
+  }, [scrollerRef.current, datas]);
   React.useEffect(function () {
     var i = 0;
     var current = scrollerRef.current;
@@ -136,18 +138,26 @@ function useFakeList(datas, scrollerRef, renderElement, options, validateItem) {
       }
 
       for (var i = origin; i < count; i++) {
-        if (pos + approximateElementHeight < MIN_POS_X) {
-          topHeight += approximateElementHeight;
+        var h = sizes.current[i] || approximateElementHeight;
+
+        if (pos + h < MIN_POS_X) {
+          topHeight += h;
         } else if (pos > MAX_POS_X) {
           bottomHeight = (count - i) * approximateElementHeight;
           break;
         } else if (!validateItem(_datas[i], i)) {
           continue;
         } else {
-          items.push(renderElement(_datas[i], i));
+          items.push(config.assumeHeightIsConstant ? renderElement(_datas[i], i) :
+          /*#__PURE__*/
+          React.createElement(Item, {
+            key: 'item-' + i,
+            index: i,
+            setItemHeight: setItemHeight
+          }, renderElement(_datas[i], i)));
         }
 
-        pos += approximateElementHeight;
+        pos += h;
       }
 
       items.unshift( /*#__PURE__*/React.createElement("div", {
@@ -166,9 +176,30 @@ function useFakeList(datas, scrollerRef, renderElement, options, validateItem) {
       }));
       return items;
     }
-  }, [dataItems, scrollerRef.current, config, renderElement, refresh, validateItem]);
+  }, [dataItems, scrollerRef.current, config, renderElement, refresh, validateItem, setItemHeight]);
   return renderList;
 }
 
+var Item = function Item(_ref) {
+  var index = _ref.index,
+      setItemHeight = _ref.setItemHeight,
+      children = _ref.children;
+  var itemRef = React.useRef();
+  var onResize = React.useCallback(function (w, h) {
+    console.log('Resize', index, w, h);
+    setItemHeight(index, h);
+  }, [index, setItemHeight]);
+
+  var _useResizeDetector = useResizeDetector({
+    onResize: onResize,
+    handleWidth: false
+  }),
+      ref = _useResizeDetector.ref;
+
+  return /*#__PURE__*/React.createElement("div", {
+    ref: ref
+  }, children);
+};
+
 export default useFakeList;
-//# sourceMappingURL=react-fakelist.esm.js.map
+//# sourceMappingURL=react-fakelist.modern.modern.js.map

@@ -1,5 +1,6 @@
 // a Hook to fake large list
 import React from "react";
+import { useResizeDetector } from 'react-resize-detector';
 import isFunction from './is.function';
 import BODY_REF from './fake.body.ref';
 const TRUTHY = ()=> true;
@@ -34,7 +35,7 @@ export default function useFakeList(
       // when ref got something, we can start drawing items
       setDataItems(datas)
     }
-  },[scrollerRef.current]);
+  },[scrollerRef.current, datas]);
   React.useEffect(()=>{
     let i = 0;
     let current = scrollerRef.current;
@@ -121,13 +122,17 @@ export default function useFakeList(
 }
 
 const Item = ({index, setItemHeight, children}) => {
-  const itemRef = React.useRef();
-  React.useLayoutEffect(()=>{
-    // each time component render, set it's size in parent
-    if (itemRef.current && setItemHeight){
-      let height = itemRef.current.getBoundingClientRect().height;
-      setItemHeight(index, height)
-    }
-  }, [itemRef.current, index, setItemHeight])
-  return <div ref={itemRef}>{children}</div>;
+  const onResize = React.useCallback((w,h)=>{
+    setItemHeight(index, h)
+  },[index, setItemHeight]);
+  const {ref } = useResizeDetector({onResize, handleWidth: false});
+  
+  // React.useLayoutEffect(()=>{
+  //   // each time component render, set it's size in parent
+  //   if (itemRef.current && setItemHeight){
+  //     let height = itemRef.current.getBoundingClientRect().height;
+  //     setItemHeight(index, height)
+  //   }
+  // }, [ref.current, index, setItemHeight])
+  return <div ref={ref}>{children}</div>;
 }
