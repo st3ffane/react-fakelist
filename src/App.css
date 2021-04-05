@@ -65,6 +65,12 @@
   padding: 5px;
   font-size: 15px;
 }
+.contact.open{
+  display: flex;
+  padding: 25px;
+  font-size: 15px;
+  border: 1px solid white;
+}
 .contact > .avatar {
   width: 48px;
   height: 48px;
@@ -75,6 +81,8 @@
 }
 .contact > .avatar.display {
   border: 2px solid blue;
+  width: 64px;
+  height: 64px;
 }
 .contact .email{
   font-size: 24px;

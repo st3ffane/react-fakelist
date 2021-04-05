@@ -1,6 +1,7 @@
 {
   "name": "react-fakelist",
   "version": "0.0.2",
+  "main": "./dist/react-fakelist.modern.js",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -13,7 +14,7 @@
     "test": "react-scripts test --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "clean": "rimraf dist",
-    "compile": "npm run clean && cross-env NODE_ENV=production babel src/hook --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,stories.js,__snapshots__"
+    "compile": "npm run clean && cross-env NODE_ENV=production microbundle-crl ./src/hook/useFakeList.js --no-compress"
   },
   "eslintConfig": {
     "extends": [
@@ -39,6 +40,7 @@
     "@babel/preset-react": "^7.13.13",
     "cross-env": "^7.0.3",
     "faker": "^5.5.2",
+    "microbundle-crl": "^0.13.11",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",

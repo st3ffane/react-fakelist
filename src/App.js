@@ -10,7 +10,7 @@ const renderItem = (item, index)=>{
 
 function Demo0({emails}){
   // SImple demo: scroll is set to window scroll (2nd param is undefined)
-  const items = useFakeList(emails, undefined, renderItem,{approximateElementHeight: 68});
+  const items = useFakeList(emails, undefined, renderItem,{approximateElementHeight: 68, assumeHeightIsConstant: false});
   return items;
 }
 function Demo1({emails}){
@@ -68,7 +68,14 @@ function App() {
 
 
 function Contact({contact}){
-  return <div className="contact">
+  const [open, setOpen] = React.useState(false);
+  const toggle = React.useCallback(()=>{
+    setOpen(!open);
+  }, [open]);
+  const classes = React.useMemo(()=>{
+    return "contact " + (open && 'open')
+  }, [open]);
+  return <div className={classes} onClick={toggle}>
     <img className={"avatar " + (contact.display ? 'display' : '')} src={contact.avatar}/>
     <div className="infos">
       <div className="email">{contact.email}</div>

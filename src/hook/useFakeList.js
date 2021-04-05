@@ -1,5 +1,7 @@
 // a Hook to fake large list
 import React from "react";
+import isFunction from './is.function';
+import BODY_REF from './fake.body.ref';
 const TRUTHY = ()=> true;
 
 const DEFAULT_OPTIONS = {
@@ -8,30 +10,6 @@ const DEFAULT_OPTIONS = {
   overhead: 3, // number of offscreen elements to draw
   assumeHeightIsConstant: true, // if true, will precalculate position based on approximateElementHeight
   // but will not be responsive. If set to false, let onResize event do **heavy** calculations
-}
-
-const BodyElement = {
-    getBoundingClientRect: ()=>{
-      // returm document.documentElement datas
-      return document.body.getBoundingClientRect()
-    },
-    addEventListener: (type, cllbck)=>{
-      window.addEventListener(type, cllbck);
-    },
-    removeEventListener:(type, cllbck)=>{
-      window.removeEventListener(type, cllbck);
-    },
-    __str__: 'Body Element'
-};
-
-Object.defineProperty(BodyElement, 'scrollTop', {
-  get:()=> window.scrollY
-});
-Object.defineProperty(BodyElement, 'clientHeight', {
-  get:()=> document.documentElement.clientHeight
-});
-const BODY_REF={
-  current: BodyElement
 }
 
 export default function useFakeList(
@@ -44,6 +22,11 @@ export default function useFakeList(
   const [dataItems, setDataItems] = React.useState([]);
   const [refresh, setRefresh] = React.useState(0); // will serve as refresher on scroll
   const [config] = React.useState({...DEFAULT_OPTIONS, ...options});
+  const sizes = React.useRef([]); // real size of items
+
+  const setItemHeight = React.useCallback((i, h)=>{
+    sizes.current[i] = h;
+  },[]);
   const approxHeight = config.approximateElementHeight;
   React.useEffect(() => {
     /* istanbul ignore else no work */
@@ -76,7 +59,7 @@ export default function useFakeList(
     /* istanbul ignore else dummy users */
     if(isFunction(renderElement) && scrollerRef.current){
       const datas = dataItems || [];
-      const scrollerSize = scrollerRef.current.getBoundingClientRect();
+      // const scrollerSize = scrollerRef.current.getBoundingClientRect();
       const {id, approximateElementHeight, overhead} = config;
       
       // simple: do all array and display on need
@@ -102,14 +85,15 @@ export default function useFakeList(
         pos += topHeight;
       } else {
         // need to take onResize into account
-        // @TODO
+        
       }      
       // end of assuming --------------------------------------------------
 
       for(let i=origin; i< count; i++){
-          if(pos + approximateElementHeight < MIN_POS_X){
+          const h = sizes.current[i] || approximateElementHeight;
+          if(pos + h < MIN_POS_X){
             // add to top
-            topHeight += approximateElementHeight;
+            topHeight += h;
           } else if (pos > MAX_POS_X){
             // add to bottom
             bottomHeight = (count - i) * approximateElementHeight;
@@ -119,9 +103,11 @@ export default function useFakeList(
             continue;
           } else {
             // affiche a l'ecran
-            items.push(renderElement(datas[i], i));
+            items.push(config.assumeHeightIsConstant
+            ? renderElement(datas[i], i) // render simply height constant element
+            : <Item key={'item-' + i} index={i} setItemHeight={setItemHeight}>{renderElement(datas[i], i)}</Item>); // add resize calculus
           }
-          pos += approximateElementHeight; // add an header
+          pos += h; // approximateElementHeight; // add an header
 
       }
 
@@ -130,11 +116,18 @@ export default function useFakeList(
       items.push(<div id={id + '-bottom'} key={id + '-fake-end'} style={{height: bottomHeight}}></div>)
       return items;
     }
-  }, [dataItems, scrollerRef.current, config, renderElement, refresh, validateItem]);
+  }, [dataItems, scrollerRef.current, config, renderElement, refresh, validateItem, setItemHeight]);
   return renderList;
 }
 
-
-const isFunction = (obj) => {
-  return !!(obj && obj.constructor && obj.call && obj.apply);
+const Item = ({index, setItemHeight, children}) => {
+  const itemRef = React.useRef();
+  React.useLayoutEffect(()=>{
+    // each time component render, set it's size in parent
+    if (itemRef.current && setItemHeight){
+      let height = itemRef.current.getBoundingClientRect().height;
+      setItemHeight(index, height)
+    }
+  }, [itemRef.current, index, setItemHeight])
+  return <div ref={itemRef}>{children}</div>;
 }

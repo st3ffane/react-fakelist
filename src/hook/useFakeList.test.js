@@ -17,6 +17,22 @@ const DUMB_DIV = ({items, responsive = false})=>{
   const elements = useFakeList(items, scroller, renderItem, {approximateElementHeight: 10, assumeHeightIsConstant : !responsive});
   return <div data-testid="scroller" ref={scroller} style={{height: 400, overflow: "scroll"}}>{elements}</div>
 }
+const EMPTY_DUMB_DIV = ()=>{
+  const scroller = React.useRef();
+  const elements = useFakeList(undefined, scroller, renderItem);
+  return <div data-testid="scroller" ref={scroller} style={{height: 400, overflow: "scroll"}}>{elements}</div>
+}
+test('renders fake list with default params- div', () => {
+  //  height of 400px; means display 4 items?
+  const { container } = render(<EMPTY_DUMB_DIV/>);
+  fireEvent.scroll(screen.getByTestId('scroller'), { target: { scrollTop: 100 } })
+  // top should be 0
+  let top = container.querySelector('#fake-list-top');
+  expect(top.getAttribute('style') === "height: 0px;").toBeTruthy();
+  // bottom should be 0 px
+  top = container.querySelector('#fake-list-bottom');
+  expect(top.getAttribute('style') === "height: 0px;").toBeTruthy();
+});
 test('renders fake list of 100 items- full window', () => {
   
   render(<DUMB items={test_datas}/>);
@@ -73,7 +89,8 @@ test('renders fake list of 100 items and scroll- div - no constant height', () =
   expect(firstElement).toBeInTheDocument();
   // top should be 70
   let top = container.querySelector('#fake-list-top');
-  expect(top.getAttribute('style') === "height: 70px;").toBeTruthy();
+
+  expect(top.getAttribute('style') === "height: 60px;").toBeTruthy();
   // bottom should be 860 px
   top = container.querySelector('#fake-list-bottom');
   expect(top.getAttribute('style') === "height: 860px;").toBeTruthy();

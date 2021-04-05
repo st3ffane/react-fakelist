@@ -91,3 +91,9 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 ### `yarn compile`
 
 Build react-fakelist library
+
+## next moves
+- **Take care of items with different sizes** items with different sizes will not break anything but scrollbar behaviour can be strange, with height of document changing while items apprears (not obvious when having a lot of datas)
+- **on resize items** when resizing window, if items height change, we fallback to the first issue (idem, not obvious when having a lot of datas)
+- **persits item component state** when scrolling, items component get recreated as needed. If datas can be persists in a store (like redux), component only informations (ie useState, ...) get lost when component get re-created. And I don't like to store component only datas in a store. Personnal taste.
+- **performance** when assuming all heights are constants, visible indexes can be precalculated easily without iterating the datas array. When assumeHeightIsConstant is false, we must calculate exactly the size with components height. There should be some algo somewhere on the net to speed up this part.
