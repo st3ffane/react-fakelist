@@ -25,7 +25,6 @@ const EMPTY_DUMB_DIV = ()=>{
 test('renders fake list with default params- div', () => {
   //  height of 400px; means display 4 items?
   const { container } = render(<EMPTY_DUMB_DIV/>);
-  fireEvent.scroll(screen.getByTestId('scroller'), { target: { scrollTop: 100 } })
   // top should be 0
   let top = container.querySelector('#fake-list-top');
   expect(top.getAttribute('style') === "height: 0px;").toBeTruthy();
@@ -94,4 +93,17 @@ test('renders fake list of 100 items and scroll- div - no constant height', () =
   // bottom should be 860 px
   top = container.querySelector('#fake-list-bottom');
   expect(top.getAttribute('style') === "height: 860px;").toBeTruthy();
+});
+test('renders fake list of 100 items and resize- div', () => {
+  //  height of 400px; means display 4 items?
+  const { container } = render(<DUMB_DIV items={test_datas}/>);
+  let firstElement = screen.getByText(/item-0/i);
+  expect(firstElement).toBeInTheDocument();
+  firstElement = screen.getByText(/item-3/i);
+  expect(firstElement).toBeInTheDocument();
+  firstElement = screen.queryByText(/item-4/i);
+  expect(firstElement).toBeFalsy();
+
+  // resize
+  window.ResizeObserver.processTest()
 });

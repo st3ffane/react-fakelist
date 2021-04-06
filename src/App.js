@@ -19,16 +19,23 @@ function Demo1({emails}){
   const items = useFakeList(emails, scroller, renderItem,{approximateElementHeight: 68});
   return <div className="scroller" ref={scroller}>{items}</div>;
 }
+function Demo3(){
+  // Simple demo: scroll is set to an inner div with 400px height
+  const scroller=React.useRef();
+  const items = useFakeList(undefined, scroller, renderItem);
+  return <div className="scroller" ref={scroller}>{items}</div>;
+}
 
 const DEMOS = [
   (emails)=> <Demo0 emails={emails}/>,
   (emails)=> <Demo1 emails={emails}/>,
+  (emails)=> <Demo3/>,
 ];
 
 function App() {
   const [emails, setEmails] = React.useState(undefined);
   const [demo, setDemo] = React.useState(0);
-  const [showAll, setShowAll] = React.useState(true);
+  // const [showAll, setShowAll] = React.useState(true);
   // const noDisplay = React.useCallback((item, i)=> {
   //   return showAll || item.display;
   // },[showAll]);
@@ -50,8 +57,9 @@ function App() {
   return (
     <div className="App">
       <div className="Selector">
-        <input type="radio" checked={demo === 0} name="demo" onChange={()=> setDemo(0)}/>Demo 0
-        <input type="radio" checked={demo === 1} name="demo" onChange={()=> setDemo(1)}/>Demo 1
+        <input type="radio" checked={demo === 0} name="demo" onChange={()=> setDemo(0)}/>Full page
+        <input type="radio" checked={demo === 1} name="demo" onChange={()=> setDemo(1)}/>In a div
+        <input type="radio" checked={demo === 2} name="demo" onChange={()=> setDemo(2)}/>Empty
       </div>
       <header className="App-header">
         

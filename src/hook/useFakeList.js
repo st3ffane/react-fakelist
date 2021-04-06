@@ -14,7 +14,7 @@ const DEFAULT_OPTIONS = {
 }
 
 export default function useFakeList(
-  datas = [], // full list to display
+  datas, // full list to display
   scrollerRef = BODY_REF, // the component that scroll, if undefined, will use window
   renderElement, // a function taking datas element param for rendering
   options = DEFAULT_OPTIONS, // some informations on elements,
@@ -89,7 +89,6 @@ export default function useFakeList(
         
       }      
       // end of assuming --------------------------------------------------
-
       for(let i=origin; i< count; i++){
           const h = sizes.current[i] || approximateElementHeight;
           if(pos + h < MIN_POS_X){
@@ -125,14 +124,8 @@ const Item = ({index, setItemHeight, children}) => {
   const onResize = React.useCallback((w,h)=>{
     setItemHeight(index, h)
   },[index, setItemHeight]);
-  const {ref } = useResizeDetector({onResize, handleWidth: false});
+  const { ref } = useResizeDetector({onResize, handleWidth: false, refreshMode: 'throttle'});
   
-  // React.useLayoutEffect(()=>{
-  //   // each time component render, set it's size in parent
-  //   if (itemRef.current && setItemHeight){
-  //     let height = itemRef.current.getBoundingClientRect().height;
-  //     setItemHeight(index, height)
-  //   }
-  // }, [ref.current, index, setItemHeight])
+  // const ref = React.useRef();
   return <div ref={ref}>{children}</div>;
 }
